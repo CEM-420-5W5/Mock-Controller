@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using mock.depart.Controllers;
 using mock.depart.Models;
 using mock.depart.Services;
+using mock.Exceptions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -120,6 +121,34 @@ namespace mock.depart.Controllers.Tests
 
             Cat? catresult = (Cat?)result!.Value;
             Assert.AreEqual(c.Id, catresult!.Id);
+        }
+
+        [TestMethod]
+        public void Delete_Code18()
+        {
+            Mock<CatsService> serviceMock = new Mock<CatsService>();
+            Mock<CatsController> controller = new Mock<CatsController>(serviceMock.Object) { CallBase = true };
+
+            CatOwner co = new CatOwner()
+            {
+                Id = "11111"
+            };
+            Cat c = new Cat()
+            {
+                Id = 1,
+                Name = "Chat 1",
+                CatOwner = co,
+                CuteLevel = Cuteness.BarelyOk
+            };
+
+            serviceMock.Setup(s => s.Get(It.IsAny<int>())).Throws(new Code18Exception());
+            controller.Setup(c => c.UserId).Returns("11111");
+
+            var actionResult = controller.Object.DeleteCat(0);
+
+            var result = actionResult.Result as UnauthorizedResult;
+
+            Assert.IsNotNull(result);
         }
     }
 }
