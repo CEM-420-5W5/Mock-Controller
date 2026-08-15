@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using mock.depart.Models;
 using mock.depart.Services;
+using mock.Exceptions;
 
 namespace mock.depart.Controllers
 {
@@ -28,23 +29,30 @@ namespace mock.depart.Controllers
             string? userid = UserId;
 
             // TODO vous devrez aussi faire un mock avec le service
-            Cat? cat = _service.Get(id);
-            if (cat == null)
+            try
             {
-                return NotFound();
+                Cat? cat = _service.Get(id);
+                if (cat == null)
+                {
+                    return NotFound();
+                }
+                if (cat.CatOwner!.Id != userid)
+                {
+                    return BadRequest("Cat is not yours");
+                }
+                if (cat.CuteLevel == Cuteness.BarelyOk)
+                {
+                    cat = _service.Delete(id);
+                    return Ok(cat);
+                }
+                else
+                {
+                    return BadRequest("Cat is too cute");
+                }
             }
-            if (cat.CatOwner!.Id != userid)
+            catch(Code18Exception)
             {
-                return BadRequest("Cat is not yours");
-            }
-            if (cat.CuteLevel == Cuteness.BarelyOk)
-            {
-                cat = _service.Delete(id);
-                return Ok(cat);
-            }
-            else
-            {
-                return BadRequest("Cat is too cute");
+                return Unauthorized();
             }
         }
     }
