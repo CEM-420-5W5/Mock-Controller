@@ -55,5 +55,11 @@ namespace mock.depart.Controllers
                 return Unauthorized();
             }
         }
+
+        [HttpGet]
+        public ActionResult<int> ChiffreChanceux()
+        {
+            return Ok(_service.ChiffreChanceux());
+        }
     }
 }
