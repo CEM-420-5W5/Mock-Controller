@@ -150,5 +150,29 @@ namespace mock.depart.Controllers.Tests
 
             Assert.IsNotNull(result);
         }
+
+        [TestMethod]
+        public void ChiffreChanceux_Ok()
+        {
+            Mock<CatsService> serviceMock = new Mock<CatsService>();
+            Mock<CatsController> controller = new Mock<CatsController>(serviceMock.Object) { CallBase = true };
+
+            serviceMock.SetupSequence(s => s.ChiffreChanceux()).Returns(33).Returns(42).Returns(67);
+            
+            var actionResult1 = controller.Object.ChiffreChanceux();
+            var result1 = actionResult1.Result as OkObjectResult;
+            Assert.IsNotNull(result1);
+            Assert.AreEqual(33, result1!.Value);
+
+            var actionResult2 = controller.Object.ChiffreChanceux();
+            var result2 = actionResult2.Result as OkObjectResult;
+            Assert.IsNotNull(result2);
+            Assert.AreEqual(42, result2!.Value);
+
+            var actionResult3 = controller.Object.ChiffreChanceux();
+            var result3 = actionResult3.Result as OkObjectResult;
+            Assert.IsNotNull(result3);
+            Assert.AreEqual(67, result3!.Value);
+        }
     }
 }
